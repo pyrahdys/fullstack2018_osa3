@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const url = 'mongodb://testuser:idlfVie82@ds131784.mlab.com:31784/fullstack-persons'
+const url = 'mongodb://testuser:---@ds131784.mlab.com:31784/fullstack-persons'
 
 mongoose.connect(url)
 

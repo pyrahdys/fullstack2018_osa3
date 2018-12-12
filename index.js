@@ -12,7 +12,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 
 console.log(morgan.format)
 
-const persons = [] // Tämä helvettiin
+const persons = []
 
 const formatPerson = (p) => {
   return {
