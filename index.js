@@ -27,7 +27,14 @@ app.get('/', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-    res.send(`<p>puhelinluettelossa on ${persons.length} henkilön tiedot</p><p>${new Date()}</p>`)
+  Person
+    .find({}, {__v: 0})
+    .then(persons => {
+      res.send(`<p>puhelinluettelossa on ${persons.length} henkilön tiedot</p><p>${new Date()}</p>`)
+    })
+    .catch(error => {
+      console.log(error)
+    })
   })
 
 app.get('/api/persons', (req, res) => {
@@ -39,28 +46,36 @@ app.get('/api/persons', (req, res) => {
     .catch(error => {
       console.log(error)
     })
-  
-  //res.json(persons) // vanha osa ennen mongoloidijuttuja
 })
 
 app.get('/api/persons/:id', (req, res) => { 
-  const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id)
-    
-    if (person) {
-        res.json(person)
-    } else {
+  Person
+    .findById(req.params.id)
+    .then(person => {
+      if (person) {
+        res.json(formatPerson(person))
+      } else {
         res.status(404).end()
-    }
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    persons = persons.filter(person => person.id !== id)
-    res.status(204).end()
+  Person
+    .findByIdAndRemove(req.params.id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => {
+      res.status(400).send({ error: 'malformatted id' })
+    })
 })
 
-const generateId = () => {
+const generateId = () => {  // tarpeeton
   return Math.floor(Math.random() * 1000000000000)
 }
 
@@ -80,7 +95,7 @@ app.post('/api/persons', (req, res) => {
     name: name,
     number: body.number,
     date: new Date()
-    //id: generateId() // poistettaneenko?
+    //id: generateId() // tarpeeton
   })
   
   person
@@ -91,9 +106,6 @@ app.post('/api/persons', (req, res) => {
     .catch(error => {
       console.log(error)
     })
-
-  //persons = persons.concat(person)
-  //res.json(person)
 })
 
 const PORT = process.env.PORT || 3001
